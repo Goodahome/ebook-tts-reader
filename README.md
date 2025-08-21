@@ -167,6 +167,12 @@ ebook-tts-reader/
 - Firefox 49+
 - Safari 7+
 - Edge 14+
+  
+### 程序截图
+
+<img width="1865" height="956" alt="image" src="https://github.com/user-attachments/assets/f2d076ab-af86-49fa-9173-aa66969799c3" />
+
+<img width="1865" height="956" alt="image" src="https://github.com/user-attachments/assets/ceb72298-9ba8-49b6-a879-39513b8952bf" />
 
 ## 贡献指南
 
@@ -179,3 +185,10 @@ MIT License
 ## 作者
 
 [@Goodahome](https://github.com/Goodahome)
+
+如果项目对你有用，可以请我喝杯咖啡吗？
+
+<img width="209" height="207" alt="image" src="https://github.com/user-attachments/assets/2df03fc2-b34e-41f5-bea9-b4073feca14b" />
+
+
+
