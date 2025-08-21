@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电子书语音朗读器</title>
+    <link rel="stylesheet" href="ebook-tts-reader.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 顶部区域：文件名 -->
+        <div class="top-bar">
+            <div class="file-info">
+                <span id="currentFileName" class="current-file-name">未选择文件</span>
+            </div>
+        </div>
+        
+        <!-- 主体区域：左右布局 -->
+        <div class="main-content">
+            <!-- 左侧控制面板 -->
+            <div class="left-panel">
+                <div class="panel-header">
+                    <h2>📚 电子书朗读器</h2>
+                    <p>支持EPUB、TXT格式，多种语音选择，可保存为MP3</p>
+                </div>
+                
+                <!-- 文件上传区域 -->
+                <div class="control-section">
+                    <h3>📁 选择电子书文件</h3>
+                    <p>支持 .epub, .txt 格式</p>
+                    <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                        选择文件
+                    </button>
+                    <input type="file" id="fileInput" class="file-input" accept=".epub,.txt" onchange="handleFileSelect(event)">
+                    <p style="margin-top: 15px; color: #666;">或拖拽文件到此处</p>
+                </div>
+                
+                <!-- 语音选择区域 -->
+                <div class="control-section">
+                    <h3>🎤 语音设置</h3>
+                    <label for="voiceSelect">选择语音</label>
+                    <select id="voiceSelect">
+                        <option value="zh-CN-YunYangNeural">云扬 (Yunyang) - 男声</option>
+                        <option value="zh-CN-XiaoxiaoNeural">晓晓 (Xiaoxiao) - 女声</option>
+                        <option value="zh-CN-YunyeNeural">云野 (Yunye) - 男声</option>
+                        <option value="zh-CN-XiaoyiNeural">晓伊 (Xiaoyi) - 女声</option>
+                        <option value="zh-CN-YunjianNeural">云健 (Yunjian) - 男声</option>
+                        <option value="zh-CN-XiaochenNeural">晓辰 (Xiaochen) - 女声</option>
+                    </select>
+                </div>
+                
+                <!-- 朗读速度控制 -->
+                <div class="control-section">
+                    <h3>⚡ 朗读速度</h3>
+                    <div class="speed-control">
+                        <button class="speed-btn" onclick="adjustSpeed(-0.1)">➖</button>
+                        <div class="speed-display" id="speedDisplay">1.0x</div>
+                        <button class="speed-btn" onclick="adjustSpeed(0.1)">➕</button>
+                    </div>
+                </div>
+                
+                <!-- 播放控制按钮 -->
+                <div class="control-section">
+                    <h3>🎮 播放控制</h3>
+                    <div class="playback-controls">
+                        <button class="control-btn" id="playBtn" onclick="togglePlayback()" disabled>
+                            ▶️ 开始朗读
+                        </button>
+                        <button class="control-btn" id="stopBtn" onclick="stopPlayback()" disabled>
+                            ⏹️ 停止
+                        </button>
+                        <button class="control-btn" id="saveBtn" onclick="saveAsMP3()" disabled>
+                            💾 保存MP3
+                        </button>
+                    </div>
+                    
+                    <!-- MP3生成进度条 -->
+                    <div id="mp3ProgressContainer" class="progress-container" style="display: none;">
+                        <h4>🎵 正在生成MP3文件...</h4>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" id="mp3ProgressBar">
+                                <div class="progress-fill" id="mp3ProgressFill"></div>
+                            </div>
+                            <div class="progress-text" id="mp3ProgressText">0%</div>
+                        </div>
+                        <div class="progress-status" id="mp3ProgressStatus">准备开始...</div>
+                        <div class="progress-actions">
+                            <button class="cancel-btn" id="mp3CancelBtn" onclick="cancelMP3Generation()" style="display: none;">❌ 取消生成</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 键盘快捷键提示 -->
+                <div class="control-section">
+                    <h3>⌨️ 键盘快捷键</h3>
+                    <div class="keyboard-hints">
+                        <ul>
+                            <li><kbd>空格</kbd> - 播放/暂停</li>
+                            <li><kbd>Esc</kbd> - 停止朗读</li>
+                            <li><kbd>Ctrl</kbd> + <kbd>S</kbd> - 保存文件</li>
+                            <li><kbd>Ctrl</kbd> + <kbd>↑</kbd> - 加快速度</li>
+                            <li><kbd>Ctrl</kbd> + <kbd>↓</kbd> - 减慢速度</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- 状态显示 -->
+                <div id="status" class="status"></div>
+            </div>
+            
+            <!-- 右侧文本显示区域 -->
+            <div class="right-panel">
+                <div class="text-preview" id="textPreview">
+                    <div class="placeholder-text">
+                        <h3>📖 文本预览</h3>
+                        <p style="text-align: center; color: #999;">文本预览将在这里显示...</p>
+                    </div>
+                    <!-- 悬浮进度条 -->
+                    <div class="floating-progress" id="floatingProgress" style="display: none;">
+                        <div class="progress-bar" onclick="jumpToProgress(event)" style="cursor: pointer;">
+                            <div class="progress-fill" id="progressFill"></div>
+                            <div class="progress-slider" id="progressSlider"></div>
+                        </div>
+                        <div class="progress-text" id="progressText"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="ebook-tts-reader.js"></script>
+</body>
+</html>
