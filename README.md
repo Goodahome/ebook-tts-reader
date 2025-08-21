@@ -27,20 +27,24 @@
 
 ## 技术栈
 
-- **前端**: HTML5, CSS3, JavaScript (ES6+)
-- **后端**: Node.js, Express
+- **前端**: HTML5, CSS3, JavaScript (ES6+) - 静态文件
+- **后端**: Node.js, Express - API服务
 - **语音合成**: Web Speech API
 - **文件处理**: JSZip (EPUB解析)
 - **音频处理**: Web Audio API
+- **架构**: 前后端分离设计
 
 ## 快速开始
 
 ### 环境要求
 
-- Node.js 14.0 或更高版本
+- Node.js 14.0 或更高版本 (仅后端API服务)
+- Web服务器 (Nginx, Apache, Tomcat 或 Python HTTP服务器)
 - 现代浏览器 (Chrome, Firefox, Safari, Edge)
 
-### 安装运行
+### 部署方式
+
+#### 方式一：开发环境快速启动
 
 1. 克隆项目
 ```bash
@@ -48,17 +52,45 @@ git clone https://github.com/Goodahome/ebook-tts-reader.git
 cd ebook-tts-reader
 ```
 
-2. 安装依赖
+2. 启动后端API服务
 ```bash
 npm install
-```
-
-3. 启动服务器
-```bash
 node server.js
 ```
 
-4. 打开浏览器访问 `http://localhost:3000`
+3. 启动前端静态文件服务
+```bash
+# 使用Python (推荐)
+python -m http.server 8000
+
+# 或使用Node.js
+npx http-server . -p 8000
+```
+
+4. 打开浏览器访问 `http://localhost:8000`
+
+#### 方式二：生产环境部署
+
+**前端部署**
+
+将以下静态文件部署到Web服务器:
+- `ebook-tts-reader.html` (主页面)
+- `ebook-tts-reader.css` (样式文件)
+- `ebook-tts-reader.js` (前端逻辑)
+
+**后端部署**
+
+1. 安装依赖并启动API服务
+```bash
+npm install
+node server.js
+```
+
+2. API服务默认运行在 `http://localhost:3000`
+
+**Nginx配置示例**
+
+参考项目根目录的 `nginx.conf` 配置文件
 
 ## 使用说明
 
@@ -87,23 +119,47 @@ node server.js
 
 ```
 ebook-tts-reader/
-├── ebook-tts-reader.html    # 主页面
-├── ebook-tts-reader.css     # 样式文件
-├── ebook-tts-reader.js      # 核心逻辑
-├── server.js                # Node.js服务器
-├── package.json             # 项目配置
-└── README.md                # 项目说明
+├── ebook-tts-reader.html    # 前端主页面
+├── ebook-tts-reader.css     # 前端样式文件
+├── ebook-tts-reader.js      # 前端核心逻辑
+├── server.js                # 后端Node.js API服务
+├── nginx.conf               # Nginx配置文件模板
+├── package.json             # 后端依赖配置
+├── package-lock.json        # 依赖锁定文件
+├── .gitignore               # Git忽略文件
+└── README.md                # 项目说明文档
 ```
 
 ## 开发说明
 
+### 架构设计
+
+本项目采用前后端分离架构：
+
+- **前端**: 纯静态文件，负责用户界面和语音合成
+- **后端**: Node.js API服务，负责文件处理和数据交互
+- **通信**: 前后端通过RESTful API进行数据交换
+
 ### 核心模块
 
+**前端模块**
 - **EbookTTSReader**: 主要的朗读器类
 - **文件解析**: 支持TXT和EPUB格式的文件解析
 - **语音合成**: 基于Web Speech API的语音合成
 - **进度管理**: 实时跟踪和显示朗读进度
 - **音频导出**: 将语音合成结果保存为MP3文件
+
+**后端模块**
+- **Express服务器**: 提供API接口
+- **文件上传处理**: 处理电子书文件上传
+- **CORS支持**: 支持跨域请求
+
+### 部署注意事项
+
+1. **端口配置**: 确保前端访问端口(80)和后端API端口(3000)不冲突
+2. **跨域设置**: 后端已配置CORS，支持跨域请求
+3. **文件路径**: 根据实际部署环境调整nginx配置中的文件路径
+4. **SSL证书**: 生产环境建议配置HTTPS
 
 ### 浏览器兼容性
 
